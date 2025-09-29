@@ -17,33 +17,32 @@ jobs:
       - name: Build Docker image
         run: |
           echo "Building Docker image..."
-          docker build -t tour-project:latest .
+          docker build -t tour-project-gitlab:latest .
 
       - name: Deploy Docker container (Zero Downtime)
         run: |
-          # Run new container on temporary port 8089
           echo "Starting new container..."
-          docker run -d --name tour-project -p 8088:8088 tour-project:latest
+          docker run -d --name tour-project-gitlab -p 8088:8088 tour-project-gitlab:latest
 
           # Wait a few seconds for the container to initialize
           echo "Waiting for container to start..."
           sleep 5
 
           # Stop & remove old container if exists
-          OLD_CONTAINER=$(docker ps -q -f name=tour-project)
+          OLD_CONTAINER=$(docker ps -q -f name=tour-project-gitlab)
           if [ -n "$OLD_CONTAINER" ]; then
             echo "Stopping old container..."
-            docker stop tour-project || true
-            docker rm tour-project || true
+            docker stop tour-project-gitlab || true
+            docker rm tour-project-gitlab || true
           fi
 
           # Rename the new container to the production name
-          docker rename tour-project-temp tour-project
+          #docker rename tour-project-temp tour-project
 
           # Optional: prune old images, keeping only the latest 3
           echo "Pruning old Docker images..."
-          docker images -q tour-project | tail -n +4 | xargs -r docker rmi -f
+          docker images -q tour-project-gitlab | tail -n +4 | xargs -r docker rmi -f
 
           # Show logs of the new container
           echo "New container logs:"
-          docker logs tour-project --tail 20
+          docker logs tour-project-gitlab --tail 20
